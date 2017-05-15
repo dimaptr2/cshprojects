@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.commandBox = new System.Windows.Forms.GroupBox();
-            this.atDate = new System.Windows.Forms.DateTimePicker();
-            this.btnZ = new System.Windows.Forms.Button();
             this.btnRead = new System.Windows.Forms.Button();
+            this.btnZ = new System.Windows.Forms.Button();
+            this.atDate = new System.Windows.Forms.DateTimePicker();
             this.commandBox.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -51,12 +51,15 @@
             this.commandBox.TabStop = false;
             this.commandBox.Text = "Печать приходных ордеров";
             // 
-            // atDate
+            // btnRead
             // 
-            this.atDate.Location = new System.Drawing.Point(6, 32);
-            this.atDate.Name = "atDate";
-            this.atDate.Size = new System.Drawing.Size(255, 22);
-            this.atDate.TabIndex = 0;
+            this.btnRead.Location = new System.Drawing.Point(6, 102);
+            this.btnRead.Name = "btnRead";
+            this.btnRead.Size = new System.Drawing.Size(255, 36);
+            this.btnRead.TabIndex = 2;
+            this.btnRead.Text = "Получить ПО";
+            this.btnRead.UseVisualStyleBackColor = true;
+            this.btnRead.Click += new System.EventHandler(this.btnRead_Click);
             // 
             // btnZ
             // 
@@ -68,15 +71,13 @@
             this.btnZ.UseVisualStyleBackColor = true;
             this.btnZ.Click += new System.EventHandler(this.btnZ_Click);
             // 
-            // btnRead
+            // atDate
             // 
-            this.btnRead.Location = new System.Drawing.Point(6, 102);
-            this.btnRead.Name = "btnRead";
-            this.btnRead.Size = new System.Drawing.Size(255, 36);
-            this.btnRead.TabIndex = 2;
-            this.btnRead.Text = "Получить ПО";
-            this.btnRead.UseVisualStyleBackColor = true;
-            this.btnRead.Click += new System.EventHandler(this.btnRead_Click);
+            this.atDate.CustomFormat = "";
+            this.atDate.Location = new System.Drawing.Point(6, 32);
+            this.atDate.Name = "atDate";
+            this.atDate.Size = new System.Drawing.Size(255, 22);
+            this.atDate.TabIndex = 0;
             // 
             // StartUI
             // 
