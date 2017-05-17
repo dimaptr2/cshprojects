@@ -95,12 +95,18 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SAPReader.cs" />
+    <Compile Include="controller\SAPReader.cs" />
     <Compile Include="StartUI.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="StartUI.Designer.cs">
       <DependentUpon>StartUI.cs</DependentUpon>
+    </Compile>
+    <Compile Include="view\ConnectProgress.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="view\ConnectProgress.Designer.cs">
+      <DependentUpon>ConnectProgress.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -115,6 +121,9 @@
       <DependentUpon>StartUI.cs</DependentUpon>
     </EmbeddedResource>
     <Content Include="logon.txt" />
+    <EmbeddedResource Include="view\ConnectProgress.resx">
+      <DependentUpon>ConnectProgress.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -138,6 +147,9 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="model\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

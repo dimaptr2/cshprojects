@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SAPEntity;
+using CashJournal.view;
 
 namespace CashJournal
 {
@@ -28,18 +29,30 @@ namespace CashJournal
         // Form initialization
         private void StartUI_Load(object sender, EventArgs e)
         {
+            ConnectProgress progressBar = new ConnectProgress();
+            progressBar.Show(this);
             DateTime currentDate = DateTime.Now;
+            progressBar.GetProgressBar().Value = 10;
+            progressBar.GetProgressBar().Update();
             atDate.Text = currentDate.ToString();
-            readLogonFile("C:\\Users\\DPETROV\\CJLogon\\logon.txt");
+            readLogonFile("logon.txt");
+            progressBar.GetProgressBar().Value = 70;
+            progressBar.GetProgressBar().Update();
             sapReader = SAPReader.getInstance(connection);
             sapReader.initSAPDestionation();
+            progressBar.GetProgressBar().Value = 100;
+            progressBar.GetProgressBar().Update();
+            progressBar.Close();
+            if (!sapReader.ConnectionSuccess)
+            {
+                Close();
+            }
         }
-
+        // Read the special file with SAP parameters for the connection
         private void readLogonFile(string fileName)
         {
             string line;
-            StreamReader file =
-                            new StreamReader(fileName);
+            StreamReader file = new StreamReader(fileName);
 
             while ((line = file.ReadLine()) != null)
             {
@@ -126,6 +139,10 @@ namespace CashJournal
             return result;
         }
 
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
     } // end of StartUI class
 
 } // end of namespace Cash Journal

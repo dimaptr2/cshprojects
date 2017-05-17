@@ -1,0 +1,12 @@
+C:\Users\DPETROV\Documents\Visual Studio 2017\Projects\CashJournal\CashJournal\bin\Debug\CashJournal.exe.config
+C:\Users\DPETROV\Documents\Visual Studio 2017\Projects\CashJournal\CashJournal\bin\Debug\CashJournal.exe
+C:\Users\DPETROV\Documents\Visual Studio 2017\Projects\CashJournal\CashJournal\bin\Debug\CashJournal.pdb
+C:\Users\DPETROV\Documents\Visual Studio 2017\Projects\CashJournal\CashJournal\bin\Debug\sapnco.dll
+C:\Users\DPETROV\Documents\Visual Studio 2017\Projects\CashJournal\CashJournal\bin\Debug\sapnco_utils.dll
+C:\Users\DPETROV\Documents\Visual Studio 2017\Projects\CashJournal\CashJournal\obj\Debug\Interop.DrvFRLib.dll
+C:\Users\DPETROV\Documents\Visual Studio 2017\Projects\CashJournal\CashJournal\obj\Debug\CashJournal.csproj.ResolveComReference.cache
+C:\Users\DPETROV\Documents\Visual Studio 2017\Projects\CashJournal\CashJournal\obj\Debug\CashJournal.Properties.Resources.resources
+C:\Users\DPETROV\Documents\Visual Studio 2017\Projects\CashJournal\CashJournal\obj\Debug\CashJournal.StartUI.resources
+C:\Users\DPETROV\Documents\Visual Studio 2017\Projects\CashJournal\CashJournal\obj\Debug\CashJournal.csproj.GenerateResource.Cache
+C:\Users\DPETROV\Documents\Visual Studio 2017\Projects\CashJournal\CashJournal\obj\Debug\CashJournal.exe
+C:\Users\DPETROV\Documents\Visual Studio 2017\Projects\CashJournal\CashJournal\obj\Debug\CashJournal.pdb

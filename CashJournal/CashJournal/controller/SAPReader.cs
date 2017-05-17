@@ -10,12 +10,13 @@ namespace SAPEntity {
         private Dictionary<string, string> connection;
         private RfcConfigParameters parameters;
         private RfcDestination destination;
+        private bool connectionSuccess;
 
         private SAPReader(Dictionary<string, string> connection)
         {
             this.connection = connection;
             parameters = new RfcConfigParameters();
-            parameters[RfcConfigParameters.Name] = "PRD500";
+            parameters[RfcConfigParameters.Name] = connection["name"];
             parameters[RfcConfigParameters.AppServerHost] = connection["ashost"];
             parameters[RfcConfigParameters.SystemNumber] = connection["sysnr"];
             parameters[RfcConfigParameters.SystemID] = connection["r3name"];
@@ -37,6 +38,21 @@ namespace SAPEntity {
             return instance;
         }
 
+        // Properties (setters and getters in the C# style)
+        public bool ConnectionSuccess
+        {
+            get
+            {
+                return connectionSuccess;
+            }
+
+            set
+            {
+                connectionSuccess = value;
+            }
+        }
+
+
         public void initSAPDestionation()
         {
             connection.Clear();
@@ -46,15 +62,25 @@ namespace SAPEntity {
                 try
                 {
                     destination = RfcDestinationManager.GetDestination(parameters);
+                    destination.Ping();
+                    connectionSuccess = true;
                 } catch (RfcInvalidParameterException ex)
                 {
+                    connectionSuccess = false;
                     MessageBox.Show(ex.Message);
                 } catch (RfcBaseException ex)
                 {
+                    connectionSuccess = false;
                     MessageBox.Show(ex.Message);
                 }
                 
             }
+
+        }
+
+        // Here are the main actions
+        public void readCashDocuments()
+        {
 
         }
 
