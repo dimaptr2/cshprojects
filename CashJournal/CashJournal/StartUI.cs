@@ -35,21 +35,25 @@ namespace CashJournal
             progressBar.GetProgressBar().Value = 10;
             progressBar.GetProgressBar().Update();
             atDate.Text = currentDate.ToString();
-            readLogonFile("logon.txt");
+            ReadLogonFile("logon.txt");
             progressBar.GetProgressBar().Value = 70;
             progressBar.GetProgressBar().Update();
-            sapReader = SAPReader.getInstance(connection);
-            sapReader.initSAPDestionation();
+            sapReader = SAPReader.GetInstance(connection);
+            sapReader.InitSAPDestionation();
             progressBar.GetProgressBar().Value = 100;
             progressBar.GetProgressBar().Update();
             progressBar.Close();
             if (!sapReader.ConnectionSuccess)
             {
                 Close();
+            } else
+            {
+                tbxCompany.Text = "1000";
+                tbxCashBox.Text = "1000";
             }
         }
         // Read the special file with SAP parameters for the connection
-        private void readLogonFile(string fileName)
+        private void ReadLogonFile(string fileName)
         {
             string line;
             StreamReader file = new StreamReader(fileName);
@@ -75,11 +79,14 @@ namespace CashJournal
 
         private void btnRead_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(convertDateToSAPFormat(atDate.Text));
+            sapReader.CompanyCode = tbxCompany.Text;
+            sapReader.CajoNumber = tbxCashBox.Text;
+            sapReader.AtDate = ConvertDateToSAPFormat(atDate.Text);
+            sapReader.GetCashDocuments();
         }
 
         // Convert the date to the internal SAP format
-        private string convertDateToSAPFormat(string value)
+        private string ConvertDateToSAPFormat(string value)
         {
             string result = "";
             string[] separator = new string[1] { " " };
@@ -143,6 +150,7 @@ namespace CashJournal
         {
             Close();
         }
+
     } // end of StartUI class
 
 } // end of namespace Cash Journal

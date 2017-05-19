@@ -10,16 +10,11 @@ using System.Windows.Forms;
 
 namespace CashJournal.view
 {
-    public partial class ConnectProgress : Form
+    public partial class ProgressTemplate : Form
     {
-        public ConnectProgress()
+        public ProgressTemplate()
         {
             InitializeComponent();
-        }
-
-        private void btnOk_Click(object sender, EventArgs e)
-        {
-            Close();
         }
 
     }
