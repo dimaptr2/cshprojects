@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace CashJournal.view
+namespace CashJournalPrinting.view
 {
     partial class ProgressTemplate
     {

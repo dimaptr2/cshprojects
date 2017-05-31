@@ -9,26 +9,37 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SAPEntity;
-using CashJournal.view;
+using CashJournalPrinting.view;
+using CashJournalPrinting.controller;
+using CashJournalModel;
 
-namespace CashJournal
+namespace CashJournalPrinting
 {
     public partial class StartUI : Form
     {
         // SAP connection parameters
         private Dictionary<string, string> connection;
         private SAPReader sapReader;
+        private FPrinterEngine printEngine;
+        private CashBoxEmulator cashBox;
+        private DataTable dataTable;
+        private string[] columnsCollection;
+        private ReceiptHead header;
+        private IList<ResultView> items;
 
         // Default constructor
         public StartUI()
         {
             InitializeComponent();
             connection = new Dictionary<string, string>();
+            header = new ReceiptHead();
+            items = new List<ResultView>();
         }
 
         // Form initialization
         private void StartUI_Load(object sender, EventArgs e)
         {
+            
             ConnectProgress progressBar = new ConnectProgress();
             progressBar.Show(this);
             DateTime currentDate = DateTime.Now;
@@ -51,7 +62,18 @@ namespace CashJournal
                 tbxCompany.Text = "1000";
                 tbxCashBox.Text = "1000";
             }
+            printEngine = FPrinterEngine.GetInstance();
+            printEngine.InitFiscalDevice();
+            cashBox = CashBoxEmulator.GetInstance();
+            cashBox.Device = printEngine;
+            dataTable = new DataTable();
+            columnsCollection = CreateTableHeader();
+            BuildTableHead(ref dataTable);
+            dataGridViewOutput.DataSource = dataTable;
+            // Add the double clicking event for the grid
+            dataGridViewOutput.DoubleClick += new EventHandler(tableRow_DoubleClick);
         }
+
         // Read the special file with SAP parameters for the connection
         private void ReadLogonFile(string fileName)
         {
@@ -71,18 +93,67 @@ namespace CashJournal
             file.Close();
         }
 
+        private string[] CreateTableHeader()
+        {
+            string[] dataColumns = new string[9];
+            dataColumns[0] = "№ п/п";
+            dataColumns[1] = "Номер книги";
+            dataColumns[2] = "БЕ";
+            dataColumns[3] = "Год";
+            dataColumns[4] = "Приходный ордер";
+            dataColumns[5] = "Дата проводки";
+            dataColumns[6] = "Текст позиции";
+            dataColumns[7] = "Исходящая поставка";
+            dataColumns[8] = "Сумма";
+
+            return dataColumns;
+        }
+
+        // Draw a head of table
+        private void BuildTableHead(ref DataTable tab)
+        {
+            foreach (string name in columnsCollection)
+            {
+                tab.Columns.Add(name);
+            }
+            // Properties of columns
+            foreach (DataColumn col in tab.Columns)
+            {
+                string name = col.ColumnName;
+            }
+        }
+
+
+        // X-Report from the gadget
+        private void btnX_Click(object sender, EventArgs e)
+        {
+            if (printEngine.IsReadyForPrinting())
+            {
+                printEngine.PrintXReport();
+            } else
+            {
+                MessageBox.Show("ФМ не открыт");
+            }   
+        }
+
         // Get Z-Report from the gadget
         private void btnZ_Click(object sender, EventArgs e)
         {
-
+            if (printEngine.IsReadyForPrinting())
+            {
+                printEngine.PrintZReport();
+            } 
         }
 
+        // Read the receipts
         private void btnRead_Click(object sender, EventArgs e)
         {
             sapReader.CompanyCode = tbxCompany.Text;
             sapReader.CajoNumber = tbxCashBox.Text;
             sapReader.AtDate = ConvertDateToSAPFormat(atDate.Text);
-            sapReader.GetCashDocuments();
+            sapReader.UploadData();
+            // Build the grid and show it
+            BuildMainGrid();
         }
 
         // Convert the date to the internal SAP format
@@ -150,6 +221,52 @@ namespace CashJournal
         {
             Close();
         }
+
+
+        // Build a grid
+        private void BuildMainGrid()
+        {
+            dataTable.Clear();
+            if (sapReader.Heads.Count > 0)
+            {
+                int counter = 0;
+                foreach (CashDoc doc in sapReader.Heads)
+                {
+                    counter++;
+                    object[] sapRow = new object[] {counter, doc.CajoNumber, doc.CompanyCode, doc.FiscalYear,
+                    doc.PostingNumber, doc.PostingDate, doc.PositionText, doc.DeliveryId, doc.Amount};
+                    DataRow dataRow = dataTable.Rows.Add(sapRow); 
+                }
+                dataTable.AcceptChanges();
+                dataGridViewOutput.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+            }
+
+        } // build the main grid view
+
+        // Double on the table row
+        private void tableRow_DoubleClick(object sender, EventArgs e)
+        {
+            DataGridViewRow currentRow = dataGridViewOutput.CurrentRow;
+            DataRow row = ((DataRowView)currentRow.DataBoundItem).Row;
+            long valDelivery = Int64.Parse(row.ItemArray[7].ToString());
+            decimal amount = decimal.Parse(row.ItemArray[8].ToString());
+            sapReader.GetOutgoingDeliveries(valDelivery, amount);
+            if (items.Count > 0)
+            {
+                items.Clear();
+            }
+            if (sapReader.ReceiptItems.Count > 0)
+            {
+               foreach (ReceiptItem ri in sapReader.ReceiptItems)
+                {
+                    ResultView rv = new ResultView();
+                    rv.MaterialName = ri.MaterialName;
+                    rv.Quantity = ri.Quantity;
+                }
+            }
+        }
+
+       
 
     } // end of StartUI class
 

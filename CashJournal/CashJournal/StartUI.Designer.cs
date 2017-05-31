@@ -1,4 +1,4 @@
-﻿namespace CashJournal
+﻿namespace CashJournalPrinting
 {
     partial class StartUI
     {
@@ -40,6 +40,7 @@
             this.atDate = new System.Windows.Forms.DateTimePicker();
             this.gbxOutput = new System.Windows.Forms.GroupBox();
             this.dataGridViewOutput = new System.Windows.Forms.DataGridView();
+            this.btnX = new System.Windows.Forms.Button();
             this.commandBox.SuspendLayout();
             this.gbxOutput.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOutput)).BeginInit();
@@ -49,6 +50,7 @@
             // 
             this.commandBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.commandBox.Controls.Add(this.btnX);
             this.commandBox.Controls.Add(this.labelAtDate);
             this.commandBox.Controls.Add(this.tbxCashBox);
             this.commandBox.Controls.Add(this.labelCashBox);
@@ -110,7 +112,7 @@
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(6, 246);
+            this.btnExit.Location = new System.Drawing.Point(6, 284);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(255, 36);
             this.btnExit.TabIndex = 3;
@@ -120,7 +122,7 @@
             // 
             // btnRead
             // 
-            this.btnRead.Location = new System.Drawing.Point(6, 204);
+            this.btnRead.Location = new System.Drawing.Point(6, 243);
             this.btnRead.Name = "btnRead";
             this.btnRead.Size = new System.Drawing.Size(255, 36);
             this.btnRead.TabIndex = 2;
@@ -130,7 +132,7 @@
             // 
             // btnZ
             // 
-            this.btnZ.Location = new System.Drawing.Point(6, 162);
+            this.btnZ.Location = new System.Drawing.Point(6, 202);
             this.btnZ.Name = "btnZ";
             this.btnZ.Size = new System.Drawing.Size(255, 36);
             this.btnZ.TabIndex = 1;
@@ -172,6 +174,17 @@
             this.dataGridViewOutput.Size = new System.Drawing.Size(614, 467);
             this.dataGridViewOutput.TabIndex = 0;
             // 
+            // btnX
+            // 
+            this.btnX.Location = new System.Drawing.Point(6, 162);
+            this.btnX.Name = "btnX";
+            this.btnX.Size = new System.Drawing.Size(255, 36);
+            this.btnX.TabIndex = 9;
+            this.btnX.Text = "X-отчёт";
+            this.btnX.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.btnX.UseVisualStyleBackColor = true;
+            this.btnX.Click += new System.EventHandler(this.btnX_Click);
+            // 
             // StartUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -205,5 +218,6 @@
         private System.Windows.Forms.Label labelCashBox;
         private System.Windows.Forms.TextBox tbxCompany;
         private System.Windows.Forms.Label labelAtDate;
+        private System.Windows.Forms.Button btnX;
     }
 }

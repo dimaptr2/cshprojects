@@ -2,6 +2,7 @@
  * Here are classes are representing the model of data 
  */
 
+using System;
 using System.Collections.Generic;
 
 namespace CashJournalModel
@@ -33,15 +34,15 @@ namespace CashJournalModel
     public class ResultView
     {
         private string materialName;
-        private string quantity;
-        private string amountPerUnit;
-        private string amount;
+        private decimal quantity;
+        private decimal amountPerUnit;
+        private decimal amount;
 
         // Accessors to the properties
         public string MaterialName { get => materialName; set => materialName = value; }
-        public string Quantity { get => quantity; set => quantity = value; }
-        public string AmountPerUnit { get => amountPerUnit; set => amountPerUnit = value; }
-        public string Amount { get => amount; set => amount = value; }
+        public decimal Quantity { get => quantity; set => quantity = value; }
+        public decimal AmountPerUnit { get => amountPerUnit; set => amountPerUnit = value; }
+        public decimal Amount { get => amount; set => amount = value; }
 
     } // ResultView
 
@@ -66,58 +67,36 @@ namespace CashJournalModel
 
     }
 
+    public class ReceiptHead
+    {
+        private long receiptId;
+        private string deliveryDate;
+
+        public long ReceiptId { get => receiptId; set => receiptId = value; }
+        public string DeliveryDate { get => deliveryDate; set => deliveryDate = value; }
+
+    }
+
     // Outgoing receipt entity and her items
     public class ReceiptItem
     {
         private long receiptId;
         private long position;
-        private string material;
+        private long material;
         private string materialName;
+        private string unit;
         private decimal quantity;
         private decimal amountPerUnit;
         private decimal amount;
 
         public long ReceiptId { get => receiptId; set => receiptId = value; }
         public long Position { get => position; set => position = value; }
-        public string Material { get => material; set => material = value; }
+        public long Material { get => material; set => material = value; }
         public string MaterialName { get => materialName; set => materialName = value; }
+        public string Unit { get => unit; set => unit = value; }
         public decimal Quantity { get => quantity; set => quantity = value; }
         public decimal AmountPerUnit { get => amountPerUnit; set => amountPerUnit = value; }
         public decimal Amount { get => amount; set => amount = value; }
-
-    }
-
-    public class Receipt
-    {
-        private long id;
-        private long actualAmount;
-
-        // Items
-        private IList<ReceiptItem> items;
-
-        public Receipt()
-        {
-            items = new List<ReceiptItem>();
-        }
-
-        public long Id { get => id; set => id = value; }
-        public long ActualAmount { get => actualAmount; set => actualAmount = value; }
-        public IList<ReceiptItem> Items { get => items; set => items = value; }
-
-        public void ClearItems()
-        {
-            items.Clear();
-        }
-
-        public void RemoveItem(ReceiptItem ri)
-        {
-            items.Remove(ri);
-        }
-
-        public void AddItem(ReceiptItem ri)
-        {
-            items.Add(ri);
-        }
 
     }
 

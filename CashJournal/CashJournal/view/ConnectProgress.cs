@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace CashJournal.view
+namespace CashJournalPrinting.view
 {
     public partial class ConnectProgress : Form
     {

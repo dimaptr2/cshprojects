@@ -93,6 +93,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="controller\CashBoxEmulator.cs" />
+    <Compile Include="controller\FPrinterEngine.cs" />
     <Compile Include="model\CashJournalModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
