@@ -117,6 +117,12 @@
     <Compile Include="view\ProgressTemplate.Designer.cs">
       <DependentUpon>ProgressTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="view\ReceiptUI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="view\ReceiptUI.Designer.cs">
+      <DependentUpon>ReceiptUI.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -136,6 +142,10 @@
     <EmbeddedResource Include="view\ProgressTemplate.resx">
       <DependentUpon>ProgressTemplate.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="view\ReceiptUI.resx">
+      <DependentUpon>ReceiptUI.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Properties\DataSources\CashJournalModel.ResultView.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -160,6 +170,5 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

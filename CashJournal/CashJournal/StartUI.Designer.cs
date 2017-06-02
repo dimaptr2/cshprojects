@@ -28,7 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.commandBox = new System.Windows.Forms.GroupBox();
+            this.btnX = new System.Windows.Forms.Button();
             this.labelAtDate = new System.Windows.Forms.Label();
             this.tbxCashBox = new System.Windows.Forms.TextBox();
             this.labelCashBox = new System.Windows.Forms.Label();
@@ -40,10 +42,11 @@
             this.atDate = new System.Windows.Forms.DateTimePicker();
             this.gbxOutput = new System.Windows.Forms.GroupBox();
             this.dataGridViewOutput = new System.Windows.Forms.DataGridView();
-            this.btnX = new System.Windows.Forms.Button();
+            this.resultViewBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.commandBox.SuspendLayout();
             this.gbxOutput.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOutput)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.resultViewBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // commandBox
@@ -68,6 +71,17 @@
             this.commandBox.TabIndex = 1;
             this.commandBox.TabStop = false;
             this.commandBox.Text = "Выбор данных";
+            // 
+            // btnX
+            // 
+            this.btnX.Location = new System.Drawing.Point(6, 162);
+            this.btnX.Name = "btnX";
+            this.btnX.Size = new System.Drawing.Size(255, 36);
+            this.btnX.TabIndex = 9;
+            this.btnX.Text = "X-отчёт";
+            this.btnX.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.btnX.UseVisualStyleBackColor = true;
+            this.btnX.Click += new System.EventHandler(this.btnX_Click);
             // 
             // labelAtDate
             // 
@@ -112,7 +126,7 @@
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(6, 284);
+            this.btnExit.Location = new System.Drawing.Point(6, 280);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(255, 36);
             this.btnExit.TabIndex = 3;
@@ -122,7 +136,7 @@
             // 
             // btnRead
             // 
-            this.btnRead.Location = new System.Drawing.Point(6, 243);
+            this.btnRead.Location = new System.Drawing.Point(6, 240);
             this.btnRead.Name = "btnRead";
             this.btnRead.Size = new System.Drawing.Size(255, 36);
             this.btnRead.TabIndex = 2;
@@ -132,7 +146,7 @@
             // 
             // btnZ
             // 
-            this.btnZ.Location = new System.Drawing.Point(6, 202);
+            this.btnZ.Location = new System.Drawing.Point(6, 201);
             this.btnZ.Name = "btnZ";
             this.btnZ.Size = new System.Drawing.Size(255, 36);
             this.btnZ.TabIndex = 1;
@@ -171,19 +185,13 @@
             this.dataGridViewOutput.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewOutput.Location = new System.Drawing.Point(6, 22);
             this.dataGridViewOutput.Name = "dataGridViewOutput";
+            this.dataGridViewOutput.ReadOnly = true;
             this.dataGridViewOutput.Size = new System.Drawing.Size(614, 467);
             this.dataGridViewOutput.TabIndex = 0;
             // 
-            // btnX
+            // resultViewBindingSource
             // 
-            this.btnX.Location = new System.Drawing.Point(6, 162);
-            this.btnX.Name = "btnX";
-            this.btnX.Size = new System.Drawing.Size(255, 36);
-            this.btnX.TabIndex = 9;
-            this.btnX.Text = "X-отчёт";
-            this.btnX.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.btnX.UseVisualStyleBackColor = true;
-            this.btnX.Click += new System.EventHandler(this.btnX_Click);
+            this.resultViewBindingSource.DataSource = typeof(CashJournalModel.ResultView);
             // 
             // StartUI
             // 
@@ -200,6 +208,7 @@
             this.commandBox.PerformLayout();
             this.gbxOutput.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOutput)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.resultViewBindingSource)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -219,5 +228,6 @@
         private System.Windows.Forms.TextBox tbxCompany;
         private System.Windows.Forms.Label labelAtDate;
         private System.Windows.Forms.Button btnX;
+        private System.Windows.Forms.BindingSource resultViewBindingSource;
     }
 }

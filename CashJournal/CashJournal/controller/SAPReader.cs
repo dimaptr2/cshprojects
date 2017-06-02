@@ -4,7 +4,6 @@ using SAP.Middleware.Connector;
 using CashJournalModel;
 using CashJournalPrinting.view;
 using System;
-using System.Threading;
 
 namespace SAPEntity {
 
@@ -22,13 +21,11 @@ namespace SAPEntity {
         // Data containers
         private IList<CashDoc> heads;
         private IRfcFunction rfcCashDocs;
-        private ReceiptHead receiptHeader;
+        private IDictionary<long, Customer> customers;
+        private IList<ReceiptHead> receiptHeaders;
         private IList<ReceiptItem> receiptItems;
 
-        // Asynchronous methods
-
-
-        private SAPReader(Dictionary<string, string> connection)
+        private SAPReader(IDictionary<string, string> connection)
         {
             this.connection = connection;
             parameters = new RfcConfigParameters();
@@ -41,12 +38,13 @@ namespace SAPEntity {
             parameters[RfcConfigParameters.Password] = connection["password"];
             parameters[RfcConfigParameters.Language] = connection["lang"];
             heads = new List<CashDoc>();
-            receiptHeader = new ReceiptHead();
+            customers = new Dictionary<long, Customer>();
+            receiptHeaders = new List<ReceiptHead>();
             receiptItems = new List<ReceiptItem>();
         }
         
         // Get a singleton
-        public static SAPReader GetInstance(Dictionary<string, string> connection)
+        public static SAPReader GetInstance(IDictionary<string, string> connection)
         {
             if (instance == null)
             {
@@ -61,7 +59,7 @@ namespace SAPEntity {
         public string CajoNumber { set => cajoNumber = value; }
         public string AtDate { set => atDate = value; } 
         public IList<CashDoc> Heads { get => heads; }
-        public ReceiptHead ReceiptHeader { get => receiptHeader; }
+        public IDictionary<long, Customer> Customers { get => customers; }
         public IList<ReceiptItem> ReceiptItems { get => receiptItems; }
        
         // Main methods of this class
@@ -135,7 +133,7 @@ namespace SAPEntity {
                 //Thread tid1 = new Thread(new ThreadStart(GetCashDocuments));
                // Thread tid2 = new Thread(new ThreadStart(GetOutgoingDeliveries));
                // tid1.Start();
-              //  tid2.Start();
+               //  tid2.Start();
                 progress.OutputProgress.Value = 70;
                 progress.OutputProgress.Update();
                 progress.OutputProgress.Value = 100;
@@ -155,6 +153,9 @@ namespace SAPEntity {
             if (heads.Count > 0)
             {
                 heads.Clear();
+                receiptHeaders.Clear();
+                receiptItems.Clear();
+                customers.Clear();
             }
            
             IRfcTable docs = rfcCashDocs.GetTable("T_CJ_DOCS");
@@ -163,76 +164,122 @@ namespace SAPEntity {
             {
                 string[] SPACE = new string[1] { " " }; // delimeter 
                 // Run through internal table in SAP
-                foreach (var row in docs)
+                foreach (IRfcStructure row in docs)
                 {
                     string posText = row.GetString("POSITION_TEXT");
                     // get only the outgoing deliveries
-                    if (!posText.Equals("") && posText.StartsWith("8"))
+                    if (!posText.Equals("") && (posText.StartsWith("0") || posText.StartsWith("8"))) 
                     {
-                        CashDoc doc = new CashDoc();
-                        doc.CajoNumber = row.GetString("CAJO_NUMBER");
-                        doc.CompanyCode = row.GetInt("COMP_CODE");
-                        doc.FiscalYear = row.GetInt("FISC_YEAR");
-                        doc.PostingNumber = row.GetLong("POSTING_NUMBER");
-                        doc.PostingDate = row.GetString("POSTING_DATE");
-                        doc.PositionText = posText;
                         string[] temp = posText.Split(SPACE, StringSplitOptions.None);
-                        doc.DeliveryId = Int64.Parse(temp[0]);
-                        doc.Amount = row.GetDecimal("H_NET_AMOUNT");
-                        heads.Add(doc);
+                        CashDoc doc = new CashDoc();
+                        long dNumber = Int64.Parse(temp[0]);
+                        // All deliveries in our ERP have the numbers between 800000000 and 899999999.
+                        if (dNumber >= 800000000L && dNumber <= 899999999L)
+                        {
+                            doc.CajoNumber = row.GetString("CAJO_NUMBER");
+                            doc.CompanyCode = row.GetInt("COMP_CODE");
+                            doc.FiscalYear = row.GetInt("FISC_YEAR");
+                            doc.PostingNumber = row.GetLong("POSTING_NUMBER");
+                            doc.PostingDate = row.GetString("POSTING_DATE");
+                            doc.PositionText = posText;
+                            doc.DeliveryId = dNumber;
+                            doc.Amount = row.GetDecimal("H_NET_AMOUNT");
+                            heads.Add(doc);
+                        }
                     }
                 } // for each
+                // Read all customers by deliveries
+                IRfcTable likp = rfcCashDocs.GetTable("T_LIKP");
+                IRfcTable lips = rfcCashDocs.GetTable("T_LIPS");
+                if (likp.RowCount > 0)
+                {
+                    IRfcFunction bapiCustomer = destination.Repository.CreateFunction("BAPI_CUSTOMER_GETLIST");
+                    foreach (IRfcStructure row in likp)
+                    {
+                        ReceiptHead rh = new ReceiptHead();
+                        rh.ReceiptId = row.GetLong("VBELN");
+                        rh.DeliveryDate = row.GetString("WADAT");
+                        receiptHeaders.Add(rh);
+                        Customer customer = new Customer();
+                        customer.CustomerId = row.GetString("KUNNR");
+                        IRfcTable range = bapiCustomer.GetTable("IDRANGE");
+                        range.Append();
+                        range.SetValue("SIGN", "I");
+                        range.SetValue("OPTION", "EQ");
+                        range.SetValue("LOW", customer.CustomerId);
+                        range.SetValue("HIGH", customer.CustomerId);
+                        bapiCustomer.Invoke(destination);
+                        IRfcTable addr = bapiCustomer.GetTable("ADDRESSDATA");
+                        if (addr.RowCount > 0)
+                        {
+                            foreach(IRfcStructure data in addr)
+                            {
+                                customer.Name = data.GetString("NAME");
+                            }
+                        }
+                        customers.Add(row.GetLong("VBELN"), customer);
+                    }
+
+                    // Read all positions from the deliveries
+                    if (lips.RowCount > 0)
+                    {
+                        foreach (IRfcStructure item in lips)
+                        {
+                            ReceiptItem ri = new ReceiptItem();
+                            ri.ReceiptId = lips.GetLong("VBELN");
+                            ri.Position = lips.GetLong("POSNR");
+                            // Positions with the splitting
+                            if (ri.Position >= 900000L && ri.Position <= 999999L)
+                            {
+                                continue;
+                            }
+                            ri.Material = lips.GetLong("MATNR");
+                            ri.MaterialName = lips.GetString("ARKTX");
+                            ri.Unit = lips.GetString("MEINS");
+                            ri.Quantity = lips.GetDecimal("LFIMG");
+                            IDictionary<long, decimal> pr = FindPricesByDeliveryId(ri.ReceiptId);
+                            if (pr != null && pr.ContainsKey(ri.Material))
+                            {
+                                ri.AmountPerUnit = pr[ri.Material];
+                                ri.Amount = ri.AmountPerUnit * ri.Quantity;
+                            }
+                            receiptItems.Add(ri);
+                        }
+                    }
+                }
             }
 
         } // Get cash journal documents
 
-        public void GetOutgoingDeliveries(long deliveryNumber, decimal amount)
+        public IList<ResultView> GetOutgoingDelivery(long deliveryNumber, decimal amount)
         {
             if (ReceiptItems.Count > 0)
             {
                 receiptItems.Clear();
             }
 
-            IRfcTable deliveryHeads = rfcCashDocs.GetTable("T_LIKP");
-            IRfcTable deliveryItems = rfcCashDocs.GetTable("T_LIPS");
-            
-            if ( deliveryHeads != null && deliveryItems != null 
-                && deliveryHeads.RowCount > 0 && deliveryItems.RowCount > 0)
+            IList<ResultView> result = new List<ResultView>();
+
+            foreach (ReceiptHead rh in receiptHeaders)
             {
-                for (int i = 0; i < deliveryHeads.RowCount; i++)
+                if (deliveryNumber == rh.ReceiptId)
                 {
-                    deliveryHeads.CurrentIndex = i;
-                    if (deliveryNumber == deliveryHeads.GetLong("VBELN"))
+                    foreach (ReceiptItem ri in receiptItems)
                     {
-                        receiptHeader.ReceiptId = deliveryHeads.GetLong("VBELN");
-                        // Get the price list by the delivery number
-                        IDictionary<long, decimal> pr = FindPricesByDeliveryId(receiptHeader.ReceiptId);
-                        receiptHeader.DeliveryDate = deliveryHeads.GetString("WADAT");
-                        for (int j = 0; j < deliveryItems.RowCount; j++)
+                        if (ri.ReceiptId == rh.ReceiptId)
                         {
-                            deliveryItems.CurrentIndex = j;
-                            if (ReceiptHeader.ReceiptId == deliveryItems.GetLong("VBELN"))
-                            {
-                                ReceiptItem ri = new ReceiptItem();
-                                ri.ReceiptId = deliveryItems.GetLong("VBELN");
-                                ri.Position = deliveryItems.GetLong("POSNR");
-                                ri.Material = deliveryItems.GetLong("MATNR");
-                                ri.MaterialName = deliveryItems.GetString("ARKTX");
-                                ri.Unit = deliveryItems.GetString("MEINS");
-                                ri.Quantity = deliveryItems.GetDecimal("LFIMG");
-                                if (pr.Count > 0)
-                                {
-                                    ri.AmountPerUnit = pr[ri.Material];
-                                    ri.Amount = ri.Quantity * ri.AmountPerUnit;
-                                }
-                                receiptItems.Add(ri);
-                            }
-                            
+                            ResultView rv = new ResultView();
+                            rv.MaterialName = ri.MaterialName;
+                            rv.Quantity = ri.Quantity;
+                            rv.AmountPerUnit = ri.AmountPerUnit;
+                            rv.Amount = ri.Amount;
+                            result.Add(rv);
                         }
-                    } 
+                    }
                 }
-               
             }
+
+            return result;
 
         } // end of method GetOutgoingDeliveries
 
@@ -248,50 +295,29 @@ namespace SAPEntity {
             IRfcTable keyParams = rfcSalesOrders.GetTable("T_KEYS");
             keyParams.Append();
             keyParams.SetValue("VBELN", convertToAlpha(id));
+            rfcSalesOrders.Invoke(destination);
+            IRfcTable vbakKeys = rfcSalesOrders.GetTable("T_VBAK_KEYS");
+            if (vbakKeys.RowCount > 0)
+            {
+                foreach (IRfcStructure keys in vbakKeys)
+                {
+                    IRfcTable sdKeys = rfcSalesInfo.GetTable("T_KEYS");
+                    sdKeys.Append();
+                    sdKeys.SetValue("VBELN", keys.GetString("VBELN"));
+                    rfcSalesInfo.Invoke(destination);
+                    IRfcTable vbap = rfcSalesInfo.GetTable("T_VBAP"); 
+                    if (vbap.RowCount > 0)
+                    {
+                        foreach (IRfcStructure row in vbap)
+                        {
+                            prices.Add(row.GetLong("MATNR"), row.GetDecimal("NETPR"));
+                        }
+                    }
+                }
+            }
 
             return prices;
         }
-
-        // Get sales orders by the delivery Id
-        private void GetPriceList(long key)
-        {
-            // Get a sales order numbers by delivery Id
-            IRfcFunction rfcSalesOrders = destination.Repository.CreateFunction("Z_RFC_GET_SDORD_BY_DELIVERY");
-            // Get a sales order master data
-            IRfcFunction rfcSalesInfo = destination.Repository.CreateFunction("Z_RFC_GET_SD_ORDERS_BY_KEY");
-
-            IRfcTable keyParams = rfcSalesOrders.GetTable("T_KEYS");
-            keyParams.Append();
-            keyParams.SetValue("VBELN", convertToAlpha(key));
-            try
-            {
-                rfcSalesOrders.Invoke(destination);
-                IRfcTable resultSet = rfcSalesOrders.GetTable("T_VBAK_KEYS");
-                if (resultSet.RowCount > 0)
-                {
-                    for (int i = 0; i < resultSet.RowCount; i++)
-                    {
-                        resultSet.CurrentIndex = i;
-                        IRfcTable sdKeys = rfcSalesInfo.GetTable("T_KEYS");
-                        sdKeys.Append();
-                        sdKeys.SetValue("VBELN", resultSet.GetString("VBELN"));
-                        rfcSalesInfo.Invoke(destination);
-                        IDictionary<long, decimal> pItems = new Dictionary<long, decimal>();
-                        IRfcTable vbap = rfcSalesInfo.GetTable("T_VBAP");
-                        for (int k = 0; k < vbap.RowCount; k++)
-                        {
-                            vbap.CurrentIndex = k;
-                           
-                        }
-                     
-                    }
-                }
-            } catch (RfcAbapException e)
-            {
-                MessageBox.Show(e.Message);
-            }
-           
-        }  // end of method GetPriceList
 
         // Add initial zeroes if we need it (delivery Id has a length equals 10 symbols)
         private string convertToAlpha(long val)

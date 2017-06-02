@@ -72,6 +72,7 @@ namespace CashJournalPrinting
             dataGridViewOutput.DataSource = dataTable;
             // Add the double clicking event for the grid
             dataGridViewOutput.DoubleClick += new EventHandler(tableRow_DoubleClick);
+            
         }
 
         // Read the special file with SAP parameters for the connection
@@ -93,18 +94,17 @@ namespace CashJournalPrinting
             file.Close();
         }
 
+        // Build the header of the table grid.
         private string[] CreateTableHeader()
         {
-            string[] dataColumns = new string[9];
+            string[] dataColumns = new string[7];
             dataColumns[0] = "№ п/п";
-            dataColumns[1] = "Номер книги";
-            dataColumns[2] = "БЕ";
-            dataColumns[3] = "Год";
-            dataColumns[4] = "Приходный ордер";
-            dataColumns[5] = "Дата проводки";
-            dataColumns[6] = "Текст позиции";
-            dataColumns[7] = "Исходящая поставка";
-            dataColumns[8] = "Сумма";
+            dataColumns[1] = "Клиент";
+            dataColumns[2] = "Приходный ордер";
+            dataColumns[3] = "Дата проводки";
+            dataColumns[4] = "Пояснительный текст";
+            dataColumns[5] = "Исходящая поставка";
+            dataColumns[6] = "Сумма";
 
             return dataColumns;
         }
@@ -112,17 +112,16 @@ namespace CashJournalPrinting
         // Draw a head of table
         private void BuildTableHead(ref DataTable tab)
         {
+            int index = 0;
             foreach (string name in columnsCollection)
             {
                 tab.Columns.Add(name);
+                DataColumn col = tab.Columns[index];
+                index++;
             }
-            // Properties of columns
-            foreach (DataColumn col in tab.Columns)
-            {
-                string name = col.ColumnName;
-            }
-        }
 
+        }
+    
 
         // X-Report from the gadget
         private void btnX_Click(object sender, EventArgs e)
@@ -229,15 +228,32 @@ namespace CashJournalPrinting
             dataTable.Clear();
             if (sapReader.Heads.Count > 0)
             {
+                decimal totalAmount = 0M;
                 int counter = 0;
+
                 foreach (CashDoc doc in sapReader.Heads)
                 {
                     counter++;
-                    object[] sapRow = new object[] {counter, doc.CajoNumber, doc.CompanyCode, doc.FiscalYear,
-                    doc.PostingNumber, doc.PostingDate, doc.PositionText, doc.DeliveryId, doc.Amount};
-                    DataRow dataRow = dataTable.Rows.Add(sapRow); 
+                    totalAmount += doc.Amount;
+                    object[] sapRow = new object[] {
+                        counter, sapReader.Customers[doc.DeliveryId].Name,
+                        doc.PostingNumber, doc.PostingDate,
+                        doc.PositionText, doc.DeliveryId, doc.Amount
+                    };
+                    dataTable.Rows.Add(sapRow); 
                 }
+                // add a final sum
+                counter++;
+                object[] finalRow = new object[] {
+                    counter, "", 0, "", "Итого: ", 0, totalAmount
+                };
+                
+                dataTable.Rows.Add(finalRow);
                 dataTable.AcceptChanges();
+                int lastIndex = counter - 1;
+                dataGridViewOutput.Columns["Сумма"].DefaultCellStyle.Format = "c";
+                dataGridViewOutput.Rows[lastIndex].DefaultCellStyle.BackColor = Color.Aquamarine;
+                dataGridViewOutput.Rows[lastIndex].DefaultCellStyle.ForeColor = Color.Black;
                 dataGridViewOutput.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
             }
 
@@ -248,26 +264,12 @@ namespace CashJournalPrinting
         {
             DataGridViewRow currentRow = dataGridViewOutput.CurrentRow;
             DataRow row = ((DataRowView)currentRow.DataBoundItem).Row;
-            long valDelivery = Int64.Parse(row.ItemArray[7].ToString());
-            decimal amount = decimal.Parse(row.ItemArray[8].ToString());
-            sapReader.GetOutgoingDeliveries(valDelivery, amount);
-            if (items.Count > 0)
-            {
-                items.Clear();
-            }
-            if (sapReader.ReceiptItems.Count > 0)
-            {
-               foreach (ReceiptItem ri in sapReader.ReceiptItems)
-                {
-                    ResultView rv = new ResultView();
-                    rv.MaterialName = ri.MaterialName;
-                    rv.Quantity = ri.Quantity;
-                }
-            }
+            long valDelivery = Int64.Parse(row.ItemArray[5].ToString());
+            decimal amount = decimal.Parse(row.ItemArray[6].ToString());
+            IList<ResultView> output = sapReader.GetOutgoingDelivery(valDelivery, amount);
         }
 
-       
-
+      
     } // end of StartUI class
 
 } // end of namespace Cash Journal

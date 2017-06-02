@@ -67,6 +67,17 @@ namespace CashJournalModel
 
     }
 
+    public class Customer
+    {
+
+        private string customerId;
+        private string name;
+
+        public string CustomerId { get => customerId; set => customerId = value; }
+        public string Name { get => name; set => name = value; }
+
+    }
+
     public class ReceiptHead
     {
         private long receiptId;

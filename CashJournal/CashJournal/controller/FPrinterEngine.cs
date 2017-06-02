@@ -47,6 +47,16 @@ namespace CashJournalPrinting
             driver.PrintReportWithoutCleaning();
         }
 
+        public void TellMeAbout()
+        {
+            driver.AboutBox();
+        }
+
+        public void Beep()
+        {
+            driver.Beep();
+        }
+
         // Z-Report
         public void PrintZReport()
         {

@@ -1,8 +1,0 @@
-﻿name=XXX
-ashost=XXXXX
-sysnr=XX
-r3name=XXX
-client=XXX
-user=XXXXXXXX
-password=XXXXXXX
-lang=XX
