@@ -28,8 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.commandBox = new System.Windows.Forms.GroupBox();
+            this.btnProperties = new System.Windows.Forms.Button();
+            this.btnPrint = new System.Windows.Forms.Button();
             this.btnX = new System.Windows.Forms.Button();
             this.labelAtDate = new System.Windows.Forms.Label();
             this.tbxCashBox = new System.Windows.Forms.TextBox();
@@ -42,17 +43,17 @@
             this.atDate = new System.Windows.Forms.DateTimePicker();
             this.gbxOutput = new System.Windows.Forms.GroupBox();
             this.dataGridViewOutput = new System.Windows.Forms.DataGridView();
-            this.resultViewBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.commandBox.SuspendLayout();
             this.gbxOutput.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOutput)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.resultViewBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // commandBox
             // 
             this.commandBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.commandBox.Controls.Add(this.btnProperties);
+            this.commandBox.Controls.Add(this.btnPrint);
             this.commandBox.Controls.Add(this.btnX);
             this.commandBox.Controls.Add(this.labelAtDate);
             this.commandBox.Controls.Add(this.tbxCashBox);
@@ -67,10 +68,32 @@
             this.commandBox.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.commandBox.Location = new System.Drawing.Point(26, 12);
             this.commandBox.Name = "commandBox";
-            this.commandBox.Size = new System.Drawing.Size(267, 495);
+            this.commandBox.Size = new System.Drawing.Size(267, 683);
             this.commandBox.TabIndex = 1;
             this.commandBox.TabStop = false;
             this.commandBox.Text = "Выбор данных";
+            // 
+            // btnProperties
+            // 
+            this.btnProperties.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnProperties.Location = new System.Drawing.Point(6, 637);
+            this.btnProperties.Name = "btnProperties";
+            this.btnProperties.Size = new System.Drawing.Size(255, 36);
+            this.btnProperties.TabIndex = 11;
+            this.btnProperties.Text = "Свойства ФР";
+            this.btnProperties.UseVisualStyleBackColor = true;
+            this.btnProperties.Click += new System.EventHandler(this.btnProperties_Click);
+            // 
+            // btnPrint
+            // 
+            this.btnPrint.Enabled = false;
+            this.btnPrint.Location = new System.Drawing.Point(6, 288);
+            this.btnPrint.Name = "btnPrint";
+            this.btnPrint.Size = new System.Drawing.Size(255, 36);
+            this.btnPrint.TabIndex = 10;
+            this.btnPrint.Text = "Распечатать всё";
+            this.btnPrint.UseVisualStyleBackColor = true;
+            this.btnPrint.Click += new System.EventHandler(this.btnPrint_Click);
             // 
             // btnX
             // 
@@ -126,7 +149,7 @@
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(6, 280);
+            this.btnExit.Location = new System.Drawing.Point(6, 330);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(255, 36);
             this.btnExit.TabIndex = 3;
@@ -136,7 +159,7 @@
             // 
             // btnRead
             // 
-            this.btnRead.Location = new System.Drawing.Point(6, 240);
+            this.btnRead.Location = new System.Drawing.Point(6, 246);
             this.btnRead.Name = "btnRead";
             this.btnRead.Size = new System.Drawing.Size(255, 36);
             this.btnRead.TabIndex = 2;
@@ -146,7 +169,7 @@
             // 
             // btnZ
             // 
-            this.btnZ.Location = new System.Drawing.Point(6, 201);
+            this.btnZ.Location = new System.Drawing.Point(6, 204);
             this.btnZ.Name = "btnZ";
             this.btnZ.Size = new System.Drawing.Size(255, 36);
             this.btnZ.TabIndex = 1;
@@ -172,7 +195,7 @@
             this.gbxOutput.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.gbxOutput.Location = new System.Drawing.Point(299, 12);
             this.gbxOutput.Name = "gbxOutput";
-            this.gbxOutput.Size = new System.Drawing.Size(626, 495);
+            this.gbxOutput.Size = new System.Drawing.Size(863, 683);
             this.gbxOutput.TabIndex = 2;
             this.gbxOutput.TabStop = false;
             this.gbxOutput.Text = "Список приходных ордеров";
@@ -186,29 +209,24 @@
             this.dataGridViewOutput.Location = new System.Drawing.Point(6, 22);
             this.dataGridViewOutput.Name = "dataGridViewOutput";
             this.dataGridViewOutput.ReadOnly = true;
-            this.dataGridViewOutput.Size = new System.Drawing.Size(614, 467);
+            this.dataGridViewOutput.Size = new System.Drawing.Size(851, 655);
             this.dataGridViewOutput.TabIndex = 0;
-            // 
-            // resultViewBindingSource
-            // 
-            this.resultViewBindingSource.DataSource = typeof(CashJournalModel.ResultView);
             // 
             // StartUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(937, 519);
+            this.ClientSize = new System.Drawing.Size(1174, 707);
             this.Controls.Add(this.gbxOutput);
             this.Controls.Add(this.commandBox);
             this.Name = "StartUI";
             this.ShowIcon = false;
-            this.Text = "Кассовая программа";
+            this.Text = "Кассовая программа \"ООО МК Павловская Слобода\"";
             this.Load += new System.EventHandler(this.StartUI_Load);
             this.commandBox.ResumeLayout(false);
             this.commandBox.PerformLayout();
             this.gbxOutput.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOutput)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.resultViewBindingSource)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -228,6 +246,7 @@
         private System.Windows.Forms.TextBox tbxCompany;
         private System.Windows.Forms.Label labelAtDate;
         private System.Windows.Forms.Button btnX;
-        private System.Windows.Forms.BindingSource resultViewBindingSource;
+        private System.Windows.Forms.Button btnPrint;
+        private System.Windows.Forms.Button btnProperties;
     }
 }

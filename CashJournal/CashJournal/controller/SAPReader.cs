@@ -22,8 +22,7 @@ namespace SAPEntity {
         private IList<CashDoc> heads;
         private IRfcFunction rfcCashDocs;
         private IDictionary<long, Customer> customers;
-        private IList<ReceiptHead> receiptHeaders;
-        private IList<ReceiptItem> receiptItems;
+        private IDictionary<long, SalesDataCache> receipts;
 
         private SAPReader(IDictionary<string, string> connection)
         {
@@ -39,8 +38,7 @@ namespace SAPEntity {
             parameters[RfcConfigParameters.Language] = connection["lang"];
             heads = new List<CashDoc>();
             customers = new Dictionary<long, Customer>();
-            receiptHeaders = new List<ReceiptHead>();
-            receiptItems = new List<ReceiptItem>();
+            receipts = new SortedDictionary<long, SalesDataCache>();
         }
         
         // Get a singleton
@@ -60,7 +58,7 @@ namespace SAPEntity {
         public string AtDate { set => atDate = value; } 
         public IList<CashDoc> Heads { get => heads; }
         public IDictionary<long, Customer> Customers { get => customers; }
-        public IList<ReceiptItem> ReceiptItems { get => receiptItems; }
+        public IDictionary<long, SalesDataCache> Receipts { get => receipts; }
        
         // Main methods of this class
         public void InitSAPDestionation()
@@ -116,6 +114,8 @@ namespace SAPEntity {
             try
             {
                 ProgressTemplate progress = new ProgressTemplate();
+                progress.StartPosition = FormStartPosition.CenterScreen;
+                progress.AllowTransparency = true;
                 progress.Text = "Выборка данных SAP";
                 progress.Show();
                 progress.OutputProgress.Value = 30;
@@ -153,8 +153,11 @@ namespace SAPEntity {
             if (heads.Count > 0)
             {
                 heads.Clear();
-                receiptHeaders.Clear();
-                receiptItems.Clear();
+                foreach (KeyValuePair<long, SalesDataCache> pair in receipts)
+                {
+                    pair.Value.ClearItems();
+                }
+                receipts.Clear();
                 customers.Clear();
             }
            
@@ -196,10 +199,38 @@ namespace SAPEntity {
                     IRfcFunction bapiCustomer = destination.Repository.CreateFunction("BAPI_CUSTOMER_GETLIST");
                     foreach (IRfcStructure row in likp)
                     {
-                        ReceiptHead rh = new ReceiptHead();
-                        rh.ReceiptId = row.GetLong("VBELN");
-                        rh.DeliveryDate = row.GetString("WADAT");
-                        receiptHeaders.Add(rh);
+                        long idValue = row.GetLong("VBELN");
+                        SalesDataCache cache = new SalesDataCache();
+                        cache.Id = idValue;
+                        foreach (IRfcStructure it in lips)
+                        {
+                            String deliveryId = convertToAlpha(idValue);
+                            if (deliveryId.Equals(it.GetString("VBELN")))
+                            {
+                                ReceiptItem ri = new ReceiptItem();
+                                ri.ReceiptId = it.GetLong("VBELN");
+                                ri.Position = it.GetLong("POSNR");
+                                // Skip the splitted positions
+                                if (ri.Position >= 900000L && ri.Position <= 999999L)
+                                {
+                                    continue;
+                                }
+                                ri.Material = it.GetLong("MATNR");
+                                ri.MaterialName = it.GetString("ARKTX");
+                                ri.Unit = it.GetString("MEINS");
+                                ri.Quantity = it.GetDecimal("LFIMG");
+                                IDictionary<long, decimal[]> pr = FindPricesByDeliveryId(ri.ReceiptId);
+                                if (pr != null && pr.ContainsKey(ri.Material))
+                                {
+                                    decimal[] prices = pr[ri.Material];
+                                    ri.AmountPerUnit = prices[0];
+                                    ri.TaxRate = prices[1];
+                                    ri.Amount = Math.Round((ri.Quantity * (ri.AmountPerUnit + ri.TaxRate)), 2);
+                                }
+                                cache.AddItem(ri);
+                            }
+                        }
+                        receipts.Add(idValue, cache);
                         Customer customer = new Customer();
                         customer.CustomerId = row.GetString("KUNNR");
                         IRfcTable range = bapiCustomer.GetTable("IDRANGE");
@@ -219,33 +250,6 @@ namespace SAPEntity {
                         }
                         customers.Add(row.GetLong("VBELN"), customer);
                     }
-
-                    // Read all positions from the deliveries
-                    if (lips.RowCount > 0)
-                    {
-                        foreach (IRfcStructure item in lips)
-                        {
-                            ReceiptItem ri = new ReceiptItem();
-                            ri.ReceiptId = lips.GetLong("VBELN");
-                            ri.Position = lips.GetLong("POSNR");
-                            // Positions with the splitting
-                            if (ri.Position >= 900000L && ri.Position <= 999999L)
-                            {
-                                continue;
-                            }
-                            ri.Material = lips.GetLong("MATNR");
-                            ri.MaterialName = lips.GetString("ARKTX");
-                            ri.Unit = lips.GetString("MEINS");
-                            ri.Quantity = lips.GetDecimal("LFIMG");
-                            IDictionary<long, decimal> pr = FindPricesByDeliveryId(ri.ReceiptId);
-                            if (pr != null && pr.ContainsKey(ri.Material))
-                            {
-                                ri.AmountPerUnit = pr[ri.Material];
-                                ri.Amount = ri.AmountPerUnit * ri.Quantity;
-                            }
-                            receiptItems.Add(ri);
-                        }
-                    }
                 }
             }
 
@@ -253,39 +257,35 @@ namespace SAPEntity {
 
         public IList<ResultView> GetOutgoingDelivery(long deliveryNumber, decimal amount)
         {
-            if (ReceiptItems.Count > 0)
-            {
-                receiptItems.Clear();
-            }
-
             IList<ResultView> result = new List<ResultView>();
+            const decimal ZERO = 0M;
 
-            foreach (ReceiptHead rh in receiptHeaders)
+            if (receipts.Count > 0)
             {
-                if (deliveryNumber == rh.ReceiptId)
+                SalesDataCache data = receipts[deliveryNumber];
+                for (int i = 0; i < data.Items.Count; i++)
                 {
-                    foreach (ReceiptItem ri in receiptItems)
+                    ResultView rv = new ResultView();
+                    rv.MaterialName = data.Items[i].MaterialName;
+                    rv.Unit = data.Items[i].Unit;
+                    rv.Quantity = data.Items[i].Quantity;
+                    if (rv.Quantity.Equals(ZERO))
                     {
-                        if (ri.ReceiptId == rh.ReceiptId)
-                        {
-                            ResultView rv = new ResultView();
-                            rv.MaterialName = ri.MaterialName;
-                            rv.Quantity = ri.Quantity;
-                            rv.AmountPerUnit = ri.AmountPerUnit;
-                            rv.Amount = ri.Amount;
-                            result.Add(rv);
-                        }
+                        continue;
                     }
+                    rv.AmountPerUnit = data.Items[i].AmountPerUnit;
+                    rv.TaxRate = data.Items[i].TaxRate;
+                    rv.Amount = data.Items[i].Amount;
+                    result.Add(rv);
                 }
             }
-
             return result;
-
         } // end of method GetOutgoingDeliveries
 
-        private IDictionary<long, decimal> FindPricesByDeliveryId(long id)
+        // Read sales orders and define prices and VAT rates. 
+        private IDictionary<long, decimal[]> FindPricesByDeliveryId(long id)
         {
-            IDictionary<long, decimal> prices = new Dictionary<long, decimal>();
+            IDictionary<long, decimal[]> prices = new Dictionary<long, decimal[]>();
 
             // Get a sales order numbers by delivery Id
             IRfcFunction rfcSalesOrders = destination.Repository.CreateFunction("Z_RFC_GET_SDORD_BY_DELIVERY");
@@ -308,9 +308,13 @@ namespace SAPEntity {
                     IRfcTable vbap = rfcSalesInfo.GetTable("T_VBAP"); 
                     if (vbap.RowCount > 0)
                     {
+                        // Get two values in the array. First value is a price, second is a tax rate. 
                         foreach (IRfcStructure row in vbap)
                         {
-                            prices.Add(row.GetLong("MATNR"), row.GetDecimal("NETPR"));
+                            decimal[] data = new decimal[2];
+                            data[0] = row.GetDecimal("NETPR");
+                            data[1] = row.GetDecimal("KZWI5");
+                            prices.Add(row.GetLong("MATNR"), data);
                         }
                     }
                 }
@@ -324,7 +328,6 @@ namespace SAPEntity {
         {
             const int LENGTH = 10;
             string strValue = val.ToString();
-
             if (strValue.Length < LENGTH)
             {
                 for (int i = 1; i <= (LENGTH - strValue.Length); i++)
@@ -332,7 +335,6 @@ namespace SAPEntity {
                     strValue = "0" + strValue;
                 }
             }
-
             return strValue;
         }
 

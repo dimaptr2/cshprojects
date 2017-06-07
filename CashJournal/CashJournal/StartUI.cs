@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using SAPEntity;
 using CashJournalPrinting.view;
-using CashJournalPrinting.controller;
 using CashJournalModel;
+using CashJournal.view;
 
 namespace CashJournalPrinting
 {
@@ -21,7 +21,6 @@ namespace CashJournalPrinting
         private Dictionary<string, string> connection;
         private SAPReader sapReader;
         private FPrinterEngine printEngine;
-        private CashBoxEmulator cashBox;
         private DataTable dataTable;
         private string[] columnsCollection;
         private ReceiptHead header;
@@ -64,8 +63,6 @@ namespace CashJournalPrinting
             }
             printEngine = FPrinterEngine.GetInstance();
             printEngine.InitFiscalDevice();
-            cashBox = CashBoxEmulator.GetInstance();
-            cashBox.Device = printEngine;
             dataTable = new DataTable();
             columnsCollection = CreateTableHeader();
             BuildTableHead(ref dataTable);
@@ -126,22 +123,13 @@ namespace CashJournalPrinting
         // X-Report from the gadget
         private void btnX_Click(object sender, EventArgs e)
         {
-            if (printEngine.IsReadyForPrinting())
-            {
-                printEngine.PrintXReport();
-            } else
-            {
-                MessageBox.Show("ФМ не открыт");
-            }   
+            printEngine.PrintXReport();
         }
 
         // Get Z-Report from the gadget
         private void btnZ_Click(object sender, EventArgs e)
         {
-            if (printEngine.IsReadyForPrinting())
-            {
-                printEngine.PrintZReport();
-            } 
+            printEngine.PrintZReport();
         }
 
         // Read the receipts
@@ -217,7 +205,7 @@ namespace CashJournalPrinting
         }
 
         private void btnExit_Click(object sender, EventArgs e)
-        {
+         {
             Close();
         }
 
@@ -244,10 +232,10 @@ namespace CashJournalPrinting
                 }
                 // add a final sum
                 counter++;
-                object[] finalRow = new object[] {
-                    counter, "", 0, "", "Итого: ", 0, totalAmount
+                object[] finalRow = new object[]
+                {
+                    "", "", "", "", "", "Итого", totalAmount
                 };
-                
                 dataTable.Rows.Add(finalRow);
                 dataTable.AcceptChanges();
                 int lastIndex = counter - 1;
@@ -267,9 +255,23 @@ namespace CashJournalPrinting
             long valDelivery = Int64.Parse(row.ItemArray[5].ToString());
             decimal amount = decimal.Parse(row.ItemArray[6].ToString());
             IList<ResultView> output = sapReader.GetOutgoingDelivery(valDelivery, amount);
+            ReceiptUI outputUI = new ReceiptUI();
+            outputUI.Delivery = valDelivery;
+            outputUI.OutputView = output;
+            outputUI.ReceiptAmount = amount;
+            outputUI.ShowDialog();
         }
 
-      
+        private void btnPrint_Click(object sender, EventArgs e)
+        {
+            printEngine.GetBeep();
+        }
+
+        private void btnProperties_Click(object sender, EventArgs e)
+        {
+            printEngine.TellMeAbout();
+        }
+
     } // end of StartUI class
 
 } // end of namespace Cash Journal

@@ -1,4 +1,7 @@
 ﻿using DrvFRLib;
+using System;
+using System.Collections.Generic;
+using CashJournalModel;
 
 namespace CashJournalPrinting
 {
@@ -49,10 +52,10 @@ namespace CashJournalPrinting
 
         public void TellMeAbout()
         {
-            driver.AboutBox();
+            driver.ShowProperties();
         }
 
-        public void Beep()
+        public void GetBeep()
         {
             driver.Beep();
         }
@@ -71,6 +74,35 @@ namespace CashJournalPrinting
         public void ResetDevice()
         {
             driver.ResetECR();
+        }
+
+        // Documents for printing creation
+        public void PrintReceipt(IList<ResultView> outList, decimal actualAmount)
+        {
+            int status = driver.GetECRStatus();
+            if (status == 4)
+            {
+                StartPrintActivity();
+            }
+            CreateReceipt(outList, actualAmount);
+        }
+
+        // PRIVATE SECTION
+
+        private void StartPrintActivity()
+        {
+            driver.FNBeginOpenSession();
+        }
+
+        private void FinishPrintActivity()
+        {
+            driver.FNCloseSession();
+        }
+
+        // Main method for the printing of receipts
+        private void CreateReceipt(IList<ResultView> items, decimal sum1)
+        {
+
         }
 
     } // FPrinterEngine

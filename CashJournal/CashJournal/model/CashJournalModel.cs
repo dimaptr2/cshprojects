@@ -34,14 +34,18 @@ namespace CashJournalModel
     public class ResultView
     {
         private string materialName;
+        private string unit;
         private decimal quantity;
         private decimal amountPerUnit;
+        private decimal taxRate;
         private decimal amount;
 
         // Accessors to the properties
         public string MaterialName { get => materialName; set => materialName = value; }
+        public string Unit { get => unit; set => unit = value; }
         public decimal Quantity { get => quantity; set => quantity = value; }
         public decimal AmountPerUnit { get => amountPerUnit; set => amountPerUnit = value; }
+        public decimal TaxRate { get => taxRate; set => taxRate = value; }
         public decimal Amount { get => amount; set => amount = value; }
 
     } // ResultView
@@ -56,7 +60,7 @@ namespace CashJournalModel
         public string Description { get => description; set => description = value; }
 
     }
-    
+
     public class Vendor
     {
         private string id;
@@ -98,6 +102,7 @@ namespace CashJournalModel
         private string unit;
         private decimal quantity;
         private decimal amountPerUnit;
+        private decimal taxRate;
         private decimal amount;
 
         public long ReceiptId { get => receiptId; set => receiptId = value; }
@@ -107,7 +112,38 @@ namespace CashJournalModel
         public string Unit { get => unit; set => unit = value; }
         public decimal Quantity { get => quantity; set => quantity = value; }
         public decimal AmountPerUnit { get => amountPerUnit; set => amountPerUnit = value; }
+        public decimal TaxRate { get => taxRate; set => taxRate = value; }
         public decimal Amount { get => amount; set => amount = value; }
+
+    }
+
+    public class SalesDataCache
+    {
+        private long id;
+        private IList<ReceiptItem> items;
+        
+        public SalesDataCache()
+        {
+            items = new List<ReceiptItem>();
+        }
+
+        public long Id { get => id; set => id = value; }
+        public IList<ReceiptItem> Items { get => items; }
+
+        public void AddItem(ReceiptItem item)
+        {
+            items.Add(item);
+        }
+
+        public void RemoveItem(ReceiptItem item)
+        {
+            items.Remove(item);
+        }
+
+        public void ClearItems()
+        {
+            items.Clear();
+        }
 
     }
 

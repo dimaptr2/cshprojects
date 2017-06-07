@@ -30,15 +30,15 @@
         {
             this.components = new System.ComponentModel.Container();
             this.gbxReceiptUI = new System.Windows.Forms.GroupBox();
+            this.labelDelivery = new System.Windows.Forms.Label();
+            this.tbxDelivery = new System.Windows.Forms.TextBox();
+            this.btnClose = new System.Windows.Forms.Button();
+            this.labelTotal = new System.Windows.Forms.Label();
+            this.tbxTotalAmount = new System.Windows.Forms.TextBox();
+            this.btnPrint = new System.Windows.Forms.Button();
             this.dataGridViewReceipt = new System.Windows.Forms.DataGridView();
             this.resultViewBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.materialNameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.quantityDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.amountPerUnitDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.amountDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.btnPrint = new System.Windows.Forms.Button();
-            this.tbxTotalAmount = new System.Windows.Forms.TextBox();
-            this.labelTotal = new System.Windows.Forms.Label();
+            this.btnDistribution = new System.Windows.Forms.Button();
             this.gbxReceiptUI.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewReceipt)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.resultViewBindingSource)).BeginInit();
@@ -49,6 +49,10 @@
             this.gbxReceiptUI.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbxReceiptUI.Controls.Add(this.btnDistribution);
+            this.gbxReceiptUI.Controls.Add(this.labelDelivery);
+            this.gbxReceiptUI.Controls.Add(this.tbxDelivery);
+            this.gbxReceiptUI.Controls.Add(this.btnClose);
             this.gbxReceiptUI.Controls.Add(this.labelTotal);
             this.gbxReceiptUI.Controls.Add(this.tbxTotalAmount);
             this.gbxReceiptUI.Controls.Add(this.btnPrint);
@@ -57,63 +61,65 @@
             this.gbxReceiptUI.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.gbxReceiptUI.Location = new System.Drawing.Point(12, 12);
             this.gbxReceiptUI.Name = "gbxReceiptUI";
-            this.gbxReceiptUI.Size = new System.Drawing.Size(750, 623);
+            this.gbxReceiptUI.Size = new System.Drawing.Size(1123, 623);
             this.gbxReceiptUI.TabIndex = 0;
             this.gbxReceiptUI.TabStop = false;
             this.gbxReceiptUI.Text = "Просмотр чека";
             // 
-            // dataGridViewReceipt
+            // labelDelivery
             // 
-            this.dataGridViewReceipt.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridViewReceipt.AutoGenerateColumns = false;
-            this.dataGridViewReceipt.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewReceipt.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.materialNameDataGridViewTextBoxColumn,
-            this.quantityDataGridViewTextBoxColumn,
-            this.amountPerUnitDataGridViewTextBoxColumn,
-            this.amountDataGridViewTextBoxColumn});
-            this.dataGridViewReceipt.DataSource = this.resultViewBindingSource;
-            this.dataGridViewReceipt.Location = new System.Drawing.Point(19, 31);
-            this.dataGridViewReceipt.Name = "dataGridViewReceipt";
-            this.dataGridViewReceipt.Size = new System.Drawing.Size(716, 483);
-            this.dataGridViewReceipt.TabIndex = 0;
+            this.labelDelivery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelDelivery.AutoSize = true;
+            this.labelDelivery.Location = new System.Drawing.Point(17, 499);
+            this.labelDelivery.Name = "labelDelivery";
+            this.labelDelivery.Size = new System.Drawing.Size(79, 16);
+            this.labelDelivery.TabIndex = 10;
+            this.labelDelivery.Text = "Поставка";
             // 
-            // resultViewBindingSource
+            // tbxDelivery
             // 
-            this.resultViewBindingSource.DataSource = typeof(CashJournalModel.ResultView);
+            this.tbxDelivery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.tbxDelivery.Location = new System.Drawing.Point(109, 496);
+            this.tbxDelivery.Name = "tbxDelivery";
+            this.tbxDelivery.ReadOnly = true;
+            this.tbxDelivery.Size = new System.Drawing.Size(165, 22);
+            this.tbxDelivery.TabIndex = 9;
+            this.tbxDelivery.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
-            // materialNameDataGridViewTextBoxColumn
+            // btnClose
             // 
-            this.materialNameDataGridViewTextBoxColumn.DataPropertyName = "MaterialName";
-            this.materialNameDataGridViewTextBoxColumn.HeaderText = "Материал";
-            this.materialNameDataGridViewTextBoxColumn.Name = "materialNameDataGridViewTextBoxColumn";
-            this.materialNameDataGridViewTextBoxColumn.Width = 150;
+            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnClose.Location = new System.Drawing.Point(536, 551);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(255, 36);
+            this.btnClose.TabIndex = 8;
+            this.btnClose.Text = "Закрыть";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // quantityDataGridViewTextBoxColumn
+            // labelTotal
             // 
-            this.quantityDataGridViewTextBoxColumn.DataPropertyName = "Quantity";
-            this.quantityDataGridViewTextBoxColumn.HeaderText = "Количество";
-            this.quantityDataGridViewTextBoxColumn.Name = "quantityDataGridViewTextBoxColumn";
-            this.quantityDataGridViewTextBoxColumn.Width = 120;
+            this.labelTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelTotal.AutoSize = true;
+            this.labelTotal.Location = new System.Drawing.Point(17, 526);
+            this.labelTotal.Name = "labelTotal";
+            this.labelTotal.Size = new System.Drawing.Size(82, 16);
+            this.labelTotal.TabIndex = 7;
+            this.labelTotal.Text = "Сумма ПО";
             // 
-            // amountPerUnitDataGridViewTextBoxColumn
+            // tbxTotalAmount
             // 
-            this.amountPerUnitDataGridViewTextBoxColumn.DataPropertyName = "AmountPerUnit";
-            this.amountPerUnitDataGridViewTextBoxColumn.HeaderText = "Цена";
-            this.amountPerUnitDataGridViewTextBoxColumn.Name = "amountPerUnitDataGridViewTextBoxColumn";
-            this.amountPerUnitDataGridViewTextBoxColumn.Width = 120;
-            // 
-            // amountDataGridViewTextBoxColumn
-            // 
-            this.amountDataGridViewTextBoxColumn.DataPropertyName = "Amount";
-            this.amountDataGridViewTextBoxColumn.HeaderText = "Сумма";
-            this.amountDataGridViewTextBoxColumn.Name = "amountDataGridViewTextBoxColumn";
-            this.amountDataGridViewTextBoxColumn.Width = 120;
+            this.tbxTotalAmount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.tbxTotalAmount.Location = new System.Drawing.Point(109, 523);
+            this.tbxTotalAmount.Name = "tbxTotalAmount";
+            this.tbxTotalAmount.ReadOnly = true;
+            this.tbxTotalAmount.Size = new System.Drawing.Size(165, 22);
+            this.tbxTotalAmount.TabIndex = 6;
+            this.tbxTotalAmount.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // btnPrint
             // 
+            this.btnPrint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnPrint.Location = new System.Drawing.Point(19, 551);
             this.btnPrint.Name = "btnPrint";
             this.btnPrint.Size = new System.Drawing.Size(255, 36);
@@ -122,33 +128,43 @@
             this.btnPrint.UseVisualStyleBackColor = true;
             this.btnPrint.Click += new System.EventHandler(this.btnPrint_Click);
             // 
-            // tbxTotalAmount
+            // dataGridViewReceipt
             // 
-            this.tbxTotalAmount.Location = new System.Drawing.Point(109, 523);
-            this.tbxTotalAmount.Name = "tbxTotalAmount";
-            this.tbxTotalAmount.ReadOnly = true;
-            this.tbxTotalAmount.Size = new System.Drawing.Size(268, 22);
-            this.tbxTotalAmount.TabIndex = 6;
-            this.tbxTotalAmount.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.dataGridViewReceipt.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridViewReceipt.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewReceipt.Location = new System.Drawing.Point(19, 31);
+            this.dataGridViewReceipt.MultiSelect = false;
+            this.dataGridViewReceipt.Name = "dataGridViewReceipt";
+            this.dataGridViewReceipt.Size = new System.Drawing.Size(1089, 449);
+            this.dataGridViewReceipt.TabIndex = 0;
             // 
-            // labelTotal
+            // resultViewBindingSource
             // 
-            this.labelTotal.AutoSize = true;
-            this.labelTotal.Location = new System.Drawing.Point(17, 526);
-            this.labelTotal.Name = "labelTotal";
-            this.labelTotal.Size = new System.Drawing.Size(82, 16);
-            this.labelTotal.TabIndex = 7;
-            this.labelTotal.Text = "Сумма ПО";
+            this.resultViewBindingSource.DataSource = typeof(CashJournalModel.ResultView);
+            // 
+            // btnDistribution
+            // 
+            this.btnDistribution.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnDistribution.Location = new System.Drawing.Point(277, 551);
+            this.btnDistribution.Name = "btnDistribution";
+            this.btnDistribution.Size = new System.Drawing.Size(255, 36);
+            this.btnDistribution.TabIndex = 11;
+            this.btnDistribution.Text = "Распределить";
+            this.btnDistribution.UseVisualStyleBackColor = true;
+            this.btnDistribution.Click += new System.EventHandler(this.btnDistribution_Click);
             // 
             // ReceiptUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(774, 647);
+            this.ClientSize = new System.Drawing.Size(1147, 647);
             this.Controls.Add(this.gbxReceiptUI);
             this.Name = "ReceiptUI";
             this.ShowIcon = false;
             this.Text = "Кассовый чек";
+            this.Load += new System.EventHandler(this.ReceiptUI_Load);
             this.gbxReceiptUI.ResumeLayout(false);
             this.gbxReceiptUI.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewReceipt)).EndInit();
@@ -162,12 +178,12 @@
         private System.Windows.Forms.GroupBox gbxReceiptUI;
         private System.Windows.Forms.DataGridView dataGridViewReceipt;
         private System.Windows.Forms.BindingSource resultViewBindingSource;
-        private System.Windows.Forms.DataGridViewTextBoxColumn materialNameDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn quantityDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn amountPerUnitDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn amountDataGridViewTextBoxColumn;
         private System.Windows.Forms.Button btnPrint;
         private System.Windows.Forms.TextBox tbxTotalAmount;
         private System.Windows.Forms.Label labelTotal;
+        private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.Label labelDelivery;
+        private System.Windows.Forms.TextBox tbxDelivery;
+        private System.Windows.Forms.Button btnDistribution;
     }
 }
