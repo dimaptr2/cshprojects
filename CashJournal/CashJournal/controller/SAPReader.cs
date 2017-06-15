@@ -309,12 +309,24 @@ namespace SAPEntity {
                     if (vbap.RowCount > 0)
                     {
                         // Get two values in the array. First value is a price, second is a tax rate. 
+                        decimal tempValue = 0M; 
+                        decimal tempVat = 0M;
+
                         foreach (IRfcStructure row in vbap)
                         {
                             decimal[] data = new decimal[2];
                             data[0] = row.GetDecimal("NETPR");
                             data[1] = row.GetDecimal("KZWI5");
-                            prices.Add(row.GetLong("MATNR"), data);
+                            tempValue += data[0];
+                            tempVat += data[1];
+                            long materialNumber = row.GetLong("MATNR");
+                            if (prices.ContainsKey(materialNumber))
+                            {
+                                prices[materialNumber] = new decimal[] { tempValue, tempVat };
+                            } else
+                            {
+                                prices.Add(materialNumber, data);
+                            }           
                         }
                     }
                 }

@@ -22,13 +22,15 @@ namespace CashJournal.view
         private IDictionary<string, decimal> sums;
         private DataTable viewResult;
         private FPrinterEngine printer;
-
+        private bool distrComplete;
+      
         public ReceiptUI()
         {
             InitializeComponent();
             sums = new Dictionary<string, decimal>();
             viewResult = new DataTable();
             printer = FPrinterEngine.GetInstance();
+            distrComplete = false;
         }
 
         public long Delivery { set => delivery = value; }
@@ -68,26 +70,54 @@ namespace CashJournal.view
             decimal price = 0M;
             decimal vat = 0M;
             decimal sum = 0M;
+            string txtUnit = "";
+            string txtQuantity = "";
+
+            if (tab.Rows.Count > 0)
+            {
+                tab.Rows.Clear();
+            }
 
             if (outputView.Count > 0)
             {
+               
                 foreach (ResultView rv in outputView)
                 {
                     price += rv.AmountPerUnit;
                     vat += rv.TaxRate;
                     sum += rv.Amount;
+                    txtQuantity = Math.Round(rv.Quantity, 3).ToString();
+                    switch (rv.Unit)
+                    {
+                        case "KG":
+                            txtUnit = "КГ";
+                            break;
+                        case "ST":
+                            txtUnit = "ШТ";
+                            break;
+                    }
                     object[] row = new object[]
                     {
-                        position, rv.MaterialName, rv.Unit, rv.Quantity, rv.AmountPerUnit, rv.TaxRate, rv.Amount
+                        position, rv.MaterialName, txtUnit, txtQuantity, rv.AmountPerUnit, rv.TaxRate, rv.Amount
                     };
                     tab.Rows.Add(row);
                     position++;
                 }
-                sums.Add("PRICE", price);
-                sums.Add("VAT", vat);
-                sums.Add("SUM", sum);
+
+                if (sums.Count == 0)
+                {
+                    sums.Add("PRICE", price);
+                    sums.Add("VAT", vat);
+                    sums.Add("SUM", sum);
+                }
+              
                 object[] finalRow = new object[] { "", "", "", "", "", "Итого", sum };
                 tab.Rows.Add(finalRow);
+                int lastIndex = position - 1;
+                AddColors(lastIndex);
+                // Refresh the receipt sum
+                //tbxTotalAmount.Text = receiptAmount.ToString();
+
             }
 
         }
@@ -111,81 +141,52 @@ namespace CashJournal.view
 
         private void btnPrint_Click(object sender, EventArgs e)
         {
-            printer.PrintReceipt(outputView, receiptAmount);
+            decimal total = CalculateSum(ref outputView);
+            printer.PrintReceipt(outputView, total, delivery);
         }
 
         private void btnDistribution_Click(object sender, EventArgs e)
         {
-            IDictionary<int, decimal>  changedPosition = RunDistribution();
-        }
-
-        // amount correction
-        private void CorrectTheAmount()
-        {
-
-            ShowDistribution();
-        }
-
-        // Run distribution
-        private IDictionary<int, decimal> RunDistribution()
-        {
-
-            IDictionary<int, decimal> mainPosition = new Dictionary<int, decimal>();
-            decimal sum;
-            decimal difference = 0M;
-            decimal coefficent = Math.Round((sums["SUM"] / receiptAmount), 6);
-
-            while (true)
+            if (!distrComplete)
             {
-                sum = 0M;
-                for (int j = 0; j < outputView.Count; j++)
-                {
-                    coefficent = outputView[j].Amount / receiptAmount;
-                    coefficent = Math.Round(coefficent, 3);
-                    outputView[j].Quantity = outputView[j].Quantity * (1 - coefficent);
-                    outputView[j].Amount =
-                        Math.Round((outputView[j].Quantity * (outputView[j].AmountPerUnit + outputView[j].TaxRate)), 2);
-                    sum += Math.Round(outputView[j].Amount, 2);
-                }
-                difference = sum - receiptAmount;
-                if (difference > 0M)
-                {
-                    continue;
-                }
-                else
-                {
-                    break;
-                }
-            }
+                RunDistribution(sums["SUM"]);
+                BuildBody(ref viewResult);
+            }        
+        }
 
-            // Add difference to the position with the greatest price
-            int index = 0;
-            decimal price = 0M;
+        // Initial quantity
+        private decimal SetInitialDistribution()
+        {
+            decimal unitSum = 0M;
 
             foreach (ResultView rv in outputView)
             {
-                int current = outputView.IndexOf(rv);
-                int next = current + 1;
-                if (next >= outputView.Count)
-                {
-                    break;
-                }
-                decimal maxValue = ChooseMaximum(outputView[current].AmountPerUnit, outputView[next].AmountPerUnit);
-                if (maxValue.Equals(outputView[current].AmountPerUnit))
-                {
-                    index = current;
-                    price = outputView[current].AmountPerUnit;
-                } else
-                {
-                    index = next;
-                    price = outputView[next].AmountPerUnit;
-                }
+                rv.Quantity = 1.000M;
+                rv.Amount = Math.Round((rv.Quantity * (rv.AmountPerUnit + rv.TaxRate)), 2);
+                unitSum += Math.Round(rv.Amount, 2);
             }
 
-            mainPosition.Add(index, price);
+            return unitSum;
+        }
 
-            return mainPosition;
+        // Run distribution
+        private void RunDistribution(decimal currentAmount)
+        {
 
+            IDictionary<int, decimal> mainPosition = new Dictionary<int, decimal>();
+            decimal sum = 0M;
+            //decimal difference = 0M;
+            decimal coefficent = Math.Round((receiptAmount / currentAmount), 4);
+            
+            for (int j = 0; j < outputView.Count; j++)
+            {
+                outputView[j].Quantity = outputView[j].Quantity * coefficent;
+                outputView[j].Amount =
+                    Math.Round((outputView[j].Quantity * (outputView[j].AmountPerUnit + outputView[j].TaxRate)), 2);
+                sum += Math.Round(outputView[j].Amount, 2);
+            }
+
+            distrComplete = true;
         }
 
         // Choose a maximum
@@ -200,36 +201,18 @@ namespace CashJournal.view
             }
         }
 
-        // quantity distribution
-        private void ShowDistribution()
+        private decimal CalculateSum(ref IList<ResultView> items)
         {
             decimal sum = 0M;
-            viewResult.Clear();
-            int counter = 1;
-
-            decimal difference = (-1) * (receiptAmount - sums["SUM"]);
-            decimal coefficent = Math.Round((difference / receiptAmount), 3);
-
-            for (int j = 0; j < outputView.Count; j++)
+        
+            foreach (ResultView rv in items)
             {
-                outputView[j].Quantity = Math.Round((coefficent * outputView[j].Quantity), 3);
-                outputView[j].Amount =
-                    Math.Round((outputView[j].Quantity * (outputView[j].AmountPerUnit + outputView[j].TaxRate)), 2);
-                sum += outputView[j].Amount;
-                object[] row = new object[]
-                {
-                        counter, outputView[j].MaterialName,  outputView[j].Unit,  outputView[j].Quantity,
-                         outputView[j].AmountPerUnit,  outputView[j].TaxRate, outputView[j].Amount
-                };
-                viewResult.Rows.Add(row);
-                counter++;
+                sum += rv.Amount;
             }
-            // Add the latest row with the total sum.
-            object[] finalRow = new object[] { "", "", "", "", "", "Итого", sum };
-            viewResult.Rows.Add(finalRow);
-            viewResult.AcceptChanges();
-            int lastIndex = viewResult.Rows.Count - 1;
-            AddColors(lastIndex);
+
+            sum = Math.Round(sum, 2);
+
+            return sum;
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -244,6 +227,6 @@ namespace CashJournal.view
             dataGridViewReceipt.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
         }
 
-
+     
     } // ReceiptUI
 }

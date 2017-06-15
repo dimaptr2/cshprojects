@@ -37,6 +37,7 @@ namespace CashJournalModel
         private string unit;
         private decimal quantity;
         private decimal amountPerUnit;
+        private string taxType;
         private decimal taxRate;
         private decimal amount;
 
@@ -45,6 +46,7 @@ namespace CashJournalModel
         public string Unit { get => unit; set => unit = value; }
         public decimal Quantity { get => quantity; set => quantity = value; }
         public decimal AmountPerUnit { get => amountPerUnit; set => amountPerUnit = value; }
+        public string TaxType { get => taxType; set => taxType = value; }
         public decimal TaxRate { get => taxRate; set => taxRate = value; }
         public decimal Amount { get => amount; set => amount = value; }
 
@@ -146,5 +148,45 @@ namespace CashJournalModel
         }
 
     }
+
+    public class PrintForm
+    {
+        private decimal amount;
+        private decimal vat10, vat18;
+        private IList<ResultView> positions;
+
+        public IList<ResultView> Positions { get => positions; set => positions = value; }
+        public decimal Amount { get => amount; }
+        public decimal Vat10 { get => vat10; }
+        public decimal Vat18 { get => vat18; }
+
+        public void InitPrintForm()
+        {
+            amount = 0M;
+            vat10 = 0M;
+            vat18 = 0M;
+        }
+
+        public void CalculateAmounts()
+        {
+            foreach (ResultView view in positions)
+            {
+                amount += view.Amount;
+                switch (view.TaxType)
+                {
+                    case "10%":
+                        vat10 += view.TaxRate;
+                        break;
+                    case "18%":
+                        vat18 += view.TaxRate;
+                        break;
+                }
+            }
+            amount = Math.Round(amount, 2);
+            vat10 = Math.Round(vat10, 2);
+            vat18 = Math.Round(vat18, 2);
+        }
+
+    }  // print form
 
 } // end of namespace CashJournalModel

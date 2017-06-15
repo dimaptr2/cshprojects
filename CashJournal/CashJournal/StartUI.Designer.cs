@@ -43,6 +43,7 @@
             this.atDate = new System.Windows.Forms.DateTimePicker();
             this.gbxOutput = new System.Windows.Forms.GroupBox();
             this.dataGridViewOutput = new System.Windows.Forms.DataGridView();
+            this.buttonInfo = new System.Windows.Forms.Button();
             this.commandBox.SuspendLayout();
             this.gbxOutput.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOutput)).BeginInit();
@@ -52,6 +53,7 @@
             // 
             this.commandBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.commandBox.Controls.Add(this.buttonInfo);
             this.commandBox.Controls.Add(this.btnProperties);
             this.commandBox.Controls.Add(this.btnPrint);
             this.commandBox.Controls.Add(this.btnX);
@@ -101,7 +103,7 @@
             this.btnX.Name = "btnX";
             this.btnX.Size = new System.Drawing.Size(255, 36);
             this.btnX.TabIndex = 9;
-            this.btnX.Text = "X-отчёт";
+            this.btnX.Text = "Открыть смену";
             this.btnX.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.btnX.UseVisualStyleBackColor = true;
             this.btnX.Click += new System.EventHandler(this.btnX_Click);
@@ -163,7 +165,7 @@
             this.btnRead.Name = "btnRead";
             this.btnRead.Size = new System.Drawing.Size(255, 36);
             this.btnRead.TabIndex = 2;
-            this.btnRead.Text = "Получить ПО";
+            this.btnRead.Text = "Получить ПКО";
             this.btnRead.UseVisualStyleBackColor = true;
             this.btnRead.Click += new System.EventHandler(this.btnRead_Click);
             // 
@@ -173,7 +175,7 @@
             this.btnZ.Name = "btnZ";
             this.btnZ.Size = new System.Drawing.Size(255, 36);
             this.btnZ.TabIndex = 1;
-            this.btnZ.Text = "Z-отчёт";
+            this.btnZ.Text = "Закрыть смену";
             this.btnZ.UseVisualStyleBackColor = true;
             this.btnZ.Click += new System.EventHandler(this.btnZ_Click);
             // 
@@ -198,7 +200,7 @@
             this.gbxOutput.Size = new System.Drawing.Size(863, 683);
             this.gbxOutput.TabIndex = 2;
             this.gbxOutput.TabStop = false;
-            this.gbxOutput.Text = "Список приходных ордеров";
+            this.gbxOutput.Text = "Список приходно-кассовых ордеров";
             // 
             // dataGridViewOutput
             // 
@@ -211,6 +213,17 @@
             this.dataGridViewOutput.ReadOnly = true;
             this.dataGridViewOutput.Size = new System.Drawing.Size(851, 655);
             this.dataGridViewOutput.TabIndex = 0;
+            // 
+            // buttonInfo
+            // 
+            this.buttonInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonInfo.Location = new System.Drawing.Point(6, 597);
+            this.buttonInfo.Name = "buttonInfo";
+            this.buttonInfo.Size = new System.Drawing.Size(255, 36);
+            this.buttonInfo.TabIndex = 12;
+            this.buttonInfo.Text = "Подробно о состоянии";
+            this.buttonInfo.UseVisualStyleBackColor = true;
+            this.buttonInfo.Click += new System.EventHandler(this.buttonInfo_Click);
             // 
             // StartUI
             // 
@@ -248,5 +261,6 @@
         private System.Windows.Forms.Button btnX;
         private System.Windows.Forms.Button btnPrint;
         private System.Windows.Forms.Button btnProperties;
+        private System.Windows.Forms.Button buttonInfo;
     }
 }

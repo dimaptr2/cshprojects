@@ -30,15 +30,16 @@
         {
             this.components = new System.ComponentModel.Container();
             this.gbxReceiptUI = new System.Windows.Forms.GroupBox();
+            this.btnDistribution = new System.Windows.Forms.Button();
             this.labelDelivery = new System.Windows.Forms.Label();
             this.tbxDelivery = new System.Windows.Forms.TextBox();
             this.btnClose = new System.Windows.Forms.Button();
             this.labelTotal = new System.Windows.Forms.Label();
             this.tbxTotalAmount = new System.Windows.Forms.TextBox();
-            this.btnPrint = new System.Windows.Forms.Button();
+            this.btnPrintDelivery = new System.Windows.Forms.Button();
             this.dataGridViewReceipt = new System.Windows.Forms.DataGridView();
             this.resultViewBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.btnDistribution = new System.Windows.Forms.Button();
+            this.btnPrintView = new System.Windows.Forms.Button();
             this.gbxReceiptUI.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewReceipt)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.resultViewBindingSource)).BeginInit();
@@ -49,13 +50,14 @@
             this.gbxReceiptUI.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbxReceiptUI.Controls.Add(this.btnPrintView);
             this.gbxReceiptUI.Controls.Add(this.btnDistribution);
             this.gbxReceiptUI.Controls.Add(this.labelDelivery);
             this.gbxReceiptUI.Controls.Add(this.tbxDelivery);
             this.gbxReceiptUI.Controls.Add(this.btnClose);
             this.gbxReceiptUI.Controls.Add(this.labelTotal);
             this.gbxReceiptUI.Controls.Add(this.tbxTotalAmount);
-            this.gbxReceiptUI.Controls.Add(this.btnPrint);
+            this.gbxReceiptUI.Controls.Add(this.btnPrintDelivery);
             this.gbxReceiptUI.Controls.Add(this.dataGridViewReceipt);
             this.gbxReceiptUI.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.gbxReceiptUI.ForeColor = System.Drawing.SystemColors.HotTrack;
@@ -65,6 +67,17 @@
             this.gbxReceiptUI.TabIndex = 0;
             this.gbxReceiptUI.TabStop = false;
             this.gbxReceiptUI.Text = "Просмотр чека";
+            // 
+            // btnDistribution
+            // 
+            this.btnDistribution.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnDistribution.Location = new System.Drawing.Point(530, 551);
+            this.btnDistribution.Name = "btnDistribution";
+            this.btnDistribution.Size = new System.Drawing.Size(255, 36);
+            this.btnDistribution.TabIndex = 11;
+            this.btnDistribution.Text = "Распределить";
+            this.btnDistribution.UseVisualStyleBackColor = true;
+            this.btnDistribution.Click += new System.EventHandler(this.btnDistribution_Click);
             // 
             // labelDelivery
             // 
@@ -79,7 +92,7 @@
             // tbxDelivery
             // 
             this.tbxDelivery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.tbxDelivery.Location = new System.Drawing.Point(109, 496);
+            this.tbxDelivery.Location = new System.Drawing.Point(111, 496);
             this.tbxDelivery.Name = "tbxDelivery";
             this.tbxDelivery.ReadOnly = true;
             this.tbxDelivery.Size = new System.Drawing.Size(165, 22);
@@ -89,7 +102,7 @@
             // btnClose
             // 
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClose.Location = new System.Drawing.Point(536, 551);
+            this.btnClose.Location = new System.Drawing.Point(785, 551);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(255, 36);
             this.btnClose.TabIndex = 8;
@@ -103,30 +116,30 @@
             this.labelTotal.AutoSize = true;
             this.labelTotal.Location = new System.Drawing.Point(17, 526);
             this.labelTotal.Name = "labelTotal";
-            this.labelTotal.Size = new System.Drawing.Size(82, 16);
+            this.labelTotal.Size = new System.Drawing.Size(91, 16);
             this.labelTotal.TabIndex = 7;
-            this.labelTotal.Text = "Сумма ПО";
+            this.labelTotal.Text = "Сумма ПКО";
             // 
             // tbxTotalAmount
             // 
             this.tbxTotalAmount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.tbxTotalAmount.Location = new System.Drawing.Point(109, 523);
+            this.tbxTotalAmount.Location = new System.Drawing.Point(111, 523);
             this.tbxTotalAmount.Name = "tbxTotalAmount";
             this.tbxTotalAmount.ReadOnly = true;
             this.tbxTotalAmount.Size = new System.Drawing.Size(165, 22);
             this.tbxTotalAmount.TabIndex = 6;
             this.tbxTotalAmount.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
-            // btnPrint
+            // btnPrintDelivery
             // 
-            this.btnPrint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnPrint.Location = new System.Drawing.Point(19, 551);
-            this.btnPrint.Name = "btnPrint";
-            this.btnPrint.Size = new System.Drawing.Size(255, 36);
-            this.btnPrint.TabIndex = 5;
-            this.btnPrint.Text = "Печать";
-            this.btnPrint.UseVisualStyleBackColor = true;
-            this.btnPrint.Click += new System.EventHandler(this.btnPrint_Click);
+            this.btnPrintDelivery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnPrintDelivery.Location = new System.Drawing.Point(19, 551);
+            this.btnPrintDelivery.Name = "btnPrintDelivery";
+            this.btnPrintDelivery.Size = new System.Drawing.Size(255, 36);
+            this.btnPrintDelivery.TabIndex = 5;
+            this.btnPrintDelivery.Text = "Печать";
+            this.btnPrintDelivery.UseVisualStyleBackColor = true;
+            this.btnPrintDelivery.Click += new System.EventHandler(this.btnPrint_Click);
             // 
             // dataGridViewReceipt
             // 
@@ -144,16 +157,15 @@
             // 
             this.resultViewBindingSource.DataSource = typeof(CashJournalModel.ResultView);
             // 
-            // btnDistribution
+            // btnPrintView
             // 
-            this.btnDistribution.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnDistribution.Location = new System.Drawing.Point(277, 551);
-            this.btnDistribution.Name = "btnDistribution";
-            this.btnDistribution.Size = new System.Drawing.Size(255, 36);
-            this.btnDistribution.TabIndex = 11;
-            this.btnDistribution.Text = "Распределить";
-            this.btnDistribution.UseVisualStyleBackColor = true;
-            this.btnDistribution.Click += new System.EventHandler(this.btnDistribution_Click);
+            this.btnPrintView.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnPrintView.Location = new System.Drawing.Point(275, 551);
+            this.btnPrintView.Name = "btnPrintView";
+            this.btnPrintView.Size = new System.Drawing.Size(255, 36);
+            this.btnPrintView.TabIndex = 12;
+            this.btnPrintView.Text = "Просмотр";
+            this.btnPrintView.UseVisualStyleBackColor = true;
             // 
             // ReceiptUI
             // 
@@ -178,12 +190,13 @@
         private System.Windows.Forms.GroupBox gbxReceiptUI;
         private System.Windows.Forms.DataGridView dataGridViewReceipt;
         private System.Windows.Forms.BindingSource resultViewBindingSource;
-        private System.Windows.Forms.Button btnPrint;
+        private System.Windows.Forms.Button btnPrintDelivery;
         private System.Windows.Forms.TextBox tbxTotalAmount;
         private System.Windows.Forms.Label labelTotal;
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Label labelDelivery;
         private System.Windows.Forms.TextBox tbxDelivery;
         private System.Windows.Forms.Button btnDistribution;
+        private System.Windows.Forms.Button btnPrintView;
     }
 }

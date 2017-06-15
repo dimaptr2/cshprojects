@@ -25,6 +25,7 @@ namespace CashJournalPrinting
         private string[] columnsCollection;
         private ReceiptHead header;
         private IList<ResultView> items;
+        private decimal totalAmount = 0M;
 
         // Default constructor
         public StartUI()
@@ -69,13 +70,17 @@ namespace CashJournalPrinting
             dataGridViewOutput.DataSource = dataTable;
             // Add the double clicking event for the grid
             dataGridViewOutput.DoubleClick += new EventHandler(tableRow_DoubleClick);
+            // Add a key down handler (ENTER, RETURN etc)
+            dataGridViewOutput.KeyDown += new KeyEventHandler(grid_keyDown);
             
         }
 
         // Read the special file with SAP parameters for the connection
         private void ReadLogonFile(string fileName)
         {
+
             string line;
+
             StreamReader file = new StreamReader(fileName);
 
             while ((line = file.ReadLine()) != null)
@@ -95,6 +100,7 @@ namespace CashJournalPrinting
         private string[] CreateTableHeader()
         {
             string[] dataColumns = new string[7];
+
             dataColumns[0] = "№ п/п";
             dataColumns[1] = "Клиент";
             dataColumns[2] = "Приходный ордер";
@@ -123,18 +129,22 @@ namespace CashJournalPrinting
         // X-Report from the gadget
         private void btnX_Click(object sender, EventArgs e)
         {
-            printEngine.PrintXReport();
+            printEngine.OpenFSession();
+            //printEngine.PrintXReport();  
         }
 
         // Get Z-Report from the gadget
         private void btnZ_Click(object sender, EventArgs e)
         {
+            //printEngine.PrintXReport();
             printEngine.PrintZReport();
+            printEngine.CloseFSession();
         }
 
         // Read the receipts
         private void btnRead_Click(object sender, EventArgs e)
         {
+           
             sapReader.CompanyCode = tbxCompany.Text;
             sapReader.CajoNumber = tbxCashBox.Text;
             sapReader.AtDate = ConvertDateToSAPFormat(atDate.Text);
@@ -205,7 +215,7 @@ namespace CashJournalPrinting
         }
 
         private void btnExit_Click(object sender, EventArgs e)
-         {
+        {
             Close();
         }
 
@@ -216,9 +226,7 @@ namespace CashJournalPrinting
             dataTable.Clear();
             if (sapReader.Heads.Count > 0)
             {
-                decimal totalAmount = 0M;
                 int counter = 0;
-
                 foreach (CashDoc doc in sapReader.Heads)
                 {
                     counter++;
@@ -262,15 +270,32 @@ namespace CashJournalPrinting
             outputUI.ShowDialog();
         }
 
+        // Press enter on the grid
+        private void grid_keyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.Enter)
+            {
+                tableRow_DoubleClick(sender, e);
+            }
+        }
+
         private void btnPrint_Click(object sender, EventArgs e)
         {
-            printEngine.GetBeep();
+            
         }
 
         private void btnProperties_Click(object sender, EventArgs e)
         {
             printEngine.TellMeAbout();
         }
+
+        // Click on the information button
+        private void buttonInfo_Click(object sender, EventArgs e)
+        {
+            int mode = printEngine.GetDeviceStatus();
+        }
+
+        // Registrate the fiscal gadget
 
     } // end of StartUI class
 
